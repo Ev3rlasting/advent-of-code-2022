@@ -1,4 +1,3 @@
-from collections import *
 a = []
 for line in open('input').readlines():
     a.append(line.strip())
