@@ -21,31 +21,19 @@ def adj(i, j):
 A = []
 for i in range(N):
     for j in range(M):
-        if mat[i][j] == 'a':
-            A.append((i, j))
-        elif mat[i][j] == 'E':
-            end = (i, j)
+        if mat[i][j] == 'E':
+            start = (i, j)
             mat[i][j] = 'z'
 
-ret = float('inf')
-
-
-def findS(i, j):
-    global ret
-    q = [(0, (i, j))]
-    S = dict()
-    while q:
-        step, (i, j) = heapq.heappop(q)
-        if (i, j) == end:
-            ret = min(ret, step)
-            break
-        for (a, b) in adj(i, j):
-            if ord(mat[a][b]) - ord(mat[i][j]) <= 1:
-                if S.get((a, b), float('inf')) > step:
-                    S[(a, b)] = step
-                    heapq.heappush(q, (step + 1, (a, b)))
-
-
-for (i, j) in A:
-    findS(i, j)
-print(ret)
+q = [(0, start)]
+S = dict()
+while q:
+    step, (i, j) = heapq.heappop(q)
+    if mat[i][j] == 'a':
+        print(step)
+        break
+    for (a, b) in adj(i, j):
+        if ord(mat[i][j]) - ord(mat[a][b]) <= 1:
+            if S.get((a, b), float('inf')) > step:
+                S[(a, b)] = step
+                heapq.heappush(q, (step + 1, (a, b)))
