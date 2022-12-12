@@ -18,7 +18,6 @@ def adj(i, j):
             yield (a, b)
 
 
-A = []
 for i in range(N):
     for j in range(M):
         if mat[i][j] == 'E':
