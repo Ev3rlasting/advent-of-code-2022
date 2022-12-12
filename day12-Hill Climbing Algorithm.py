@@ -18,28 +18,34 @@ def adj(i, j):
             yield (a, b)
 
 
-visited = set()
-q = []
+A = []
 for i in range(N):
     for j in range(M):
-        if mat[i][j] == 'S':
-            start = (i, j)
-            mat[i][j] = 'a'
-            heapq.heappush(q, (0, start))
-        if mat[i][j] == 'E':
+        if mat[i][j] == 'a':
+            A.append((i, j))
+        elif mat[i][j] == 'E':
             end = (i, j)
             mat[i][j] = 'z'
-S = dict()
 
-while q:
-    step, (i, j) = heapq.heappop(q)
-    if (i, j) == end:
-        print(step)
-        break
-    for (a, b) in adj(i, j):
-        if ord(mat[a][b]) - ord(mat[i][j]) <= 1:
-            if S.get((a, b), float('inf')) > step:
-                S[(a, b)] = step
-                heapq.heappush(q, (step + 1, (a, b)))
+ret = float('inf')
 
-# pprint(S)
+
+def findS(i, j):
+    global ret
+    q = [(0, (i, j))]
+    S = dict()
+    while q:
+        step, (i, j) = heapq.heappop(q)
+        if (i, j) == end:
+            ret = min(ret, step)
+            break
+        for (a, b) in adj(i, j):
+            if ord(mat[a][b]) - ord(mat[i][j]) <= 1:
+                if S.get((a, b), float('inf')) > step:
+                    S[(a, b)] = step
+                    heapq.heappush(q, (step + 1, (a, b)))
+
+
+for (i, j) in A:
+    findS(i, j)
+print(ret)
