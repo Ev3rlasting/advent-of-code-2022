@@ -43,16 +43,13 @@ O = set()
 
 
 def decide(i, j):
-    if i < 0 or i == maxY or j < 0 or j == maxX - minY:
+    if i < 0 or i == maxX or j < 0 or j == maxY - minY:
         return False
-    down = (i + 1, j)
-    downLeft = (i + 1, j - 1)
-    downRight = (i + 1, j + 1)
-    if mat[down[0]][down[1]] == '.':
+    if mat[i + 1][j] == '.':
         return decide(i + 1, j)  # move down
-    if mat[downLeft[0]][downLeft[1]] == '.':
+    if mat[i + 1][j - 1] == '.':
         return decide(i + 1, j - 1)
-    if mat[downRight[0]][downRight[1]] == '.':
+    if mat[i + 1][j + 1] == '.':
         return decide(i + 1, j + 1)
     else:  # all three slots in the bottom line is filled, fill current slot
         mat[i][j] = 'o'
@@ -64,7 +61,9 @@ ret = 0
 for i in range(1000):
     x, y = START
     rrr = decide(x, y)
-    print(len(O))
+    if not rrr:
+        print(len(O))
+        break
     ret += 1
-pprint(mat)
+# pprint(mat)
 # print(ret)
