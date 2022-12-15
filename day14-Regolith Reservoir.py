@@ -16,7 +16,6 @@ for line in lines:
     temp = []
     for point in points:
         y, x = list(map(int, point.split(',')))
-        y = y
         maxX = max(maxX, x)
         temp.append((x, y))
     for i in range(len(temp) - 1):
@@ -30,20 +29,12 @@ ret = 0
 INF = maxX + 1
 def decide(i, j):
     global ret
-    if (i + 1, j) not in ROCK and i < INF:
-        return decide(i + 1, j)  # move down
-    if (i + 1, j - 1) not in ROCK and i < INF:  # move left
-        return decide(i + 1, j - 1)
-    if (i + 1, j + 1) not in ROCK and i < INF:  # move right
-        return decide(i + 1, j + 1)
-    if i + 1 == INF:  # reach the inf wall
-        ROCK.add((i, j))
-        ret += 1
-        return True
-    else:  # all three slots in the bottom line is filled, fill current slot
-        ROCK.add((i, j))
-        ret += 1
-        return True
+    for ii, jj in ((1, 0), (1, -1), (1, 1)):
+        if (i + ii, j + jj) not in ROCK and i < INF:
+            return decide(i + ii, j + jj)
+    ROCK.add((i, j))
+    ret += 1
+    return True
 
 for i in range(10000000):
     x, y = START
