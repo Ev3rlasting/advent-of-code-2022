@@ -13,8 +13,6 @@ lines = [_.strip() for _ in lines]
 
 ret = 0
 G = defaultdict(list)
-OPEN = set()
-CLOSE = set()
 RATES = dict()
 for line in lines:
     line = line.replace('Valve ', '').replace(' has flow rate=', ' ') \
@@ -26,14 +24,11 @@ for line in lines:
     rate = int(rate)
     RATES[v] = rate
     leads = leads.split(',')
-    CLOSE.add(v)
     for lead in leads:
         G[v].append(lead)
 
-# pprint(G)
 DIST = dict()
 ALL_NODES = G.keys()
-
 
 def get_dist(start, end):
     if start == end: return 0
@@ -67,12 +62,10 @@ def dfs(curr, minutes, total, remained):
         if m >= 30: continue
         dfs(nxt, m, total + RATES[nxt] * (30 - m + 1), remained - {nxt})
 
-
 dfs('AA', 1, 0, NONZEROS)
-# pprint(DIST)
 print('part1', ret)
-
 ret = 0
+
 def dfs2(curr1, curr2, min1, min2, total, remained):
     global ret
     ret = max(ret, total)
