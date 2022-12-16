@@ -58,18 +58,33 @@ NONZEROS = {node for node in ALL_NODES if RATES[node] > 0}
 
 remained = NONZEROS
 
-def dfs(curr, minutes, total, remained, path):
+
+def dfs(curr, minutes, total, remained):
     global ret
     ret = max(ret, total)
     for nxt in remained:
         m = minutes + DIST[(curr, nxt)] + 1
         if m >= 30: continue
-        dfs(nxt, m,
-            total + RATES[nxt] * (30 - m + 1),
-            remained - {nxt},
-            path + [(nxt, minutes + DIST[(curr, nxt)] + 1)])
+        dfs(nxt, m, total + RATES[nxt] * (30 - m + 1), remained - {nxt})
 
 
-dfs('AA', 1, 0, NONZEROS, [])
-pprint(DIST)
-print(ret)
+dfs('AA', 1, 0, NONZEROS)
+# pprint(DIST)
+print('part1', ret)
+
+ret = 0
+def dfs2(curr1, curr2, min1, min2, total, remained):
+    global ret
+    ret = max(ret, total)
+    for nxt1 in remained:
+        for nxt2 in remained:
+            if nxt1 == nxt2: continue
+            m1 = min1 + DIST[(curr1, nxt1)] + 1
+            m2 = min2 + DIST[(curr2, nxt2)] + 1
+            if m1 >= 26 or m2 >= 26: continue
+            t = total + RATES[nxt1] * (26 - m1 + 1)
+            t += RATES[nxt2] * (26 - m2 + 1)
+            dfs2(nxt1, nxt2, m1, m2, t, remained - {nxt1, nxt2})
+
+dfs2('AA', 'AA', 1, 1, 0, NONZEROS)
+print('part2', ret)
