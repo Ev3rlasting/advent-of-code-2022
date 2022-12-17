@@ -13,41 +13,40 @@ lines = [_.strip() for _ in lines]
 
 OPS = lines[0]
 ORDER = ['-', '+', '⅃', '|', '#']
+# x,y offset to left-bottom point of the rectangle box where the shape is in
 SHAPE = {
-    '-': ((0, 0), (0, 1), (0, 2), (0, 3)),
-    '+': ((0, 1), (1, 0), (1, 1), (1, 2), (2, 1)),
-    '⅃': ((0, 2), (1, 2), (2, 0), (2, 1), (2, 2)),
-    '|': ((0, 0), (1, 0), (2, 0), (3, 0)),
-    '#': ((0, 0), (0, 1), (1, 0), (1, 1)),
+    '-': ((0, 0), (1, 0), (2, 0), (3, 0)),
+    '+': ((0, -1), (1, -2), (1, -1), (2, -1), (1, 0)),
+    '⅃': ((0, 0), (1, 0), (2, 0), (2, -1), (2, -2)),
+    '|': ((0, 0), (0, -1), (0, -2), (0, -3)),
+    '#': ((0, 0), (0, -1), (1, -1), (1, 0)),
 }
 
-LEFT_DOWN = {
+# x offset of the starting point of the left-bottom rectangle box
+START = {
     '-': (2, 0),
-    '+': (3, 2),
-    '⅃': (4, 2),
+    '+': (2, 2),
+    '⅃': (2, 2),
     '|': (2, 3),
-    '#': (2, 1)
+    '#': (2, 1),
 }
 
 DROPPED = {}
 
-def drop(shape, i, j):
-
-
-
-
-ret = 0
+highest = 0
 n = 0
 move = 0
 while True:
-    for o in ORDER:
+    for s in ORDER:
         if n == 2023:
-            print(ret)
+            print(highest)
             break
-        start_y, start_x = START[o][0], ret - START[o][0]
+        start_x = START[s]
+        start_y = highest + 3
 
-        shape = SHAPE[o]
-        direction = OPS[move % len(OPS)]
+        print(f'Shape {s} starting at {(start_x, start_y)}')
+        # shape = SHAPE[s]
+        # direction = OPS[move % len(OPS)]
         n += 1
 
-print(ret)
+# print(ret)
