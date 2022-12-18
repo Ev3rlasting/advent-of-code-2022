@@ -1,3 +1,4 @@
+import collections
 import functools
 import heapq
 import itertools
@@ -69,15 +70,18 @@ DROPPED = set()
 highest = 0
 n = 0
 block = 0
-while block < 2024:
+diff = ''
+prev = 0
+N = 2023
+while block < N:
     for shape in ORDER:
         block += 1
-        prev = highest
-        if block == 2023:
+        diff += str(highest - prev)
+        if block == N:
             print('part1', highest)
-            sys.exit(0)
+        prev = highest
         point = complex(2, highest + 3)
-        print(f'Shape "{shape}" starting at {point}, current stack height: {highest}')
+        # print(f'Shape "{shape}" starting at {point}, current stack height: {highest}')
         # draw(highest + 3, point, shape)
         while True:
             direction = DIR[MOVES[n % len(MOVES)]]
@@ -95,3 +99,126 @@ while block < 2024:
             n += 1
             # print(f'\tcurrent point at {point}')
             # draw(highest + 3, point, shape)
+
+
+# COPY paste Robin-Karp algo from online :(
+def search(L: int, a: int, MOD: int, n: int, nums) -> str:
+    """
+    Rabin-Karp with polynomial rolling hash.
+    Search a substring of given length
+    that occurs at least 2 times.
+    @return start position if the substring exits and -1 otherwise.
+    """
+    # Compute the hash of the substring S[:L].
+    h = 0
+    for i in range(L):
+        h = (h * a + nums[i]) % MOD
+
+    # Store the already seen hash values for substrings of length L.
+    seen = collections.defaultdict(list)
+    seen[h].append(0)
+
+    # Const value to be used often : a**L % MOD
+    aL = pow(a, L, MOD)
+    for start in range(1, n - L + 1):
+        # Compute the rolling hash in O(1) time
+        h = (h * a - nums[start - 1] * aL + nums[start + L - 1]) % MOD
+        if h in seen:
+            # Check if the current substring matches any of the previous substrings with hash h.
+            current_substring = nums[start: start + L]
+            if any(current_substring == nums[index: index + L] for index in seen[h]):
+                return start
+        seen[h].append(start)
+    return -1
+
+
+# COPY paste Robin-Karp algo from online :(
+def longestDupSubstring(S: str) -> str:
+    # Modulus value for the rolling hash function to avoid overflow.
+    MOD = 10 ** 13
+
+    # Select a base value for the rolling hash function.
+    a = 26
+    n = len(S)
+
+    # Convert string to array of integers to implement constant time slice.
+    nums = [ord(S[i]) - ord('a') for i in range(n)]
+
+    # Use binary search to find the longest duplicate substring.
+    start = -1
+    left, right = 1, n - 1
+    while left <= right:
+        # Guess the length of the longest substring.
+        L = left + (right - left) // 2
+        start_of_duplicate = search(L, a, MOD, n, nums)
+
+        # If a duplicate substring of length L exists, increase left and store the
+        # starting index of the duplicate substring.  Otherwise decrease right.
+        if start_of_duplicate != -1:
+            left = L + 1
+            start = start_of_duplicate
+        else:
+            right = L - 1
+
+    # The longest substring (if any) begins at index start and ends at start + left.
+    return S[start: start + left - 1]
+
+
+# print(longestDupSubstring(diff))
+
+# the boundary is prefix + repeating part length after worked out from Robin-karp algo
+prefix = 290
+prefix_l = 184
+repeating = [2, 2, 1, 3, 3, 0, 2, 0, 2, 3, 2, 0, 1, 2, 2, 2, 2, 1, 0, 3, 2, 2, 1, 1, 2, 1, 1, 1, 3, 2, 4, 0, 1, 3, 0, 3,
+             0, 0, 3, 3, 2, 0, 1, 3, 0, 0, 2, 1, 3, 3, 2, 0, 1, 3, 3, 0, 0, 1, 3, 0, 2, 2, 1, 3, 3, 0, 2, 1, 3, 0, 3, 0,
+             0, 3, 3, 2, 0, 1, 3, 0, 3, 2, 1, 3, 3, 2, 0, 1, 1, 3, 2, 0, 1, 2, 1, 3, 0, 1, 3, 3, 2, 2, 1, 3, 2, 1, 1, 1,
+             3, 2, 2, 0, 0, 1, 2, 2, 0, 1, 1, 2, 4, 0, 1, 2, 2, 2, 2, 1, 2, 2, 4, 0, 1, 3, 2, 0, 1, 0, 3, 3, 2, 0, 1, 2,
+             3, 2, 0, 0, 2, 3, 0, 2, 1, 3, 3, 4, 0, 0, 2, 0, 0, 2, 1, 0, 3, 4, 0, 0, 0, 3, 2, 0, 0, 2, 2, 1, 1, 0, 3, 3,
+             2, 0, 1, 3, 3, 0, 0, 0, 2, 2, 2, 2, 0, 0, 1, 2, 0, 0, 3, 2, 4, 0, 1, 3, 3, 0, 2, 1, 3, 3, 2, 0, 1, 2, 2, 2,
+             2, 1, 2, 1, 2, 0, 1, 3, 2, 0, 2, 1, 3, 3, 0, 0, 1, 2, 2, 2, 0, 1, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 3, 3, 0, 2,
+             1, 3, 3, 2, 2, 1, 2, 1, 4, 2, 1, 2, 3, 0, 2, 1, 3, 3, 4, 0, 0, 2, 2, 4, 2, 0, 2, 2, 2, 0, 1, 3, 3, 2, 2, 1,
+             3, 0, 0, 0, 1, 3, 2, 2, 2, 0, 0, 2, 2, 2, 1, 3, 3, 2, 2, 1, 3, 3, 2, 0, 1, 2, 2, 4, 0, 1, 3, 0, 1, 1, 0, 3,
+             2, 2, 0, 1, 3, 2, 1, 1, 1, 3, 2, 2, 0, 1, 3, 0, 2, 0, 1, 2, 2, 4, 0, 1, 3, 0, 3, 0, 1, 3, 2, 4, 0, 1, 3, 3,
+             4, 0, 1, 3, 2, 2, 2, 1, 3, 3, 0, 0, 1, 3, 3, 4, 0, 0, 0, 3, 2, 0, 0, 1, 3, 2, 0, 1, 3, 2, 4, 0, 1, 3, 3, 2,
+             0, 1, 3, 3, 0, 0, 1, 3, 3, 0, 0, 1, 3, 3, 2, 2, 1, 3, 3, 0, 0, 1, 2, 2, 2, 0, 1, 2, 3, 0, 2, 1, 3, 0, 4, 0,
+             1, 2, 3, 2, 0, 1, 3, 2, 2, 0, 1, 2, 3, 0, 2, 1, 3, 2, 1, 2, 1, 3, 2, 1, 1, 1, 3, 2, 0, 0, 0, 2, 1, 2, 0, 1,
+             3, 3, 4, 0, 1, 3, 0, 0, 2, 1, 3, 2, 0, 0, 0, 2, 1, 2, 0, 1, 3, 0, 4, 0, 1, 3, 3, 0, 0, 1, 3, 3, 0, 0, 1, 1,
+             2, 4, 0, 1, 2, 2, 2, 0, 1, 2, 1, 3, 0, 0, 1, 2, 2, 2, 1, 3, 3, 2, 2, 1, 2, 1, 4, 2, 1, 3, 3, 4, 0, 1, 3, 2,
+             2, 2, 1, 2, 3, 2, 0, 1, 3, 3, 0, 2, 1, 2, 2, 1, 0, 0, 3, 2, 4, 2, 1, 2, 3, 2, 0, 1, 2, 1, 4, 0, 0, 1, 2, 4,
+             0, 1, 3, 3, 2, 2, 1, 3, 2, 2, 0, 1, 2, 1, 3, 0, 0, 3, 0, 3, 0, 0, 0, 3, 4, 0, 0, 0, 3, 2, 0, 0, 2, 3, 4, 0,
+             1, 3, 0, 2, 0, 1, 3, 2, 4, 2, 1, 3, 2, 0, 2, 1, 0, 3, 2, 2, 1, 3, 3, 4, 0, 1, 3, 3, 0, 0, 1, 2, 3, 0, 1, 1,
+             3, 0, 2, 2, 1, 3, 2, 2, 0, 1, 3, 3, 0, 0, 1, 2, 3, 0, 0, 0, 3, 3, 2, 2, 1, 3, 3, 0, 0, 1, 3, 3, 4, 0, 0, 2,
+             3, 2, 0, 1, 3, 3, 2, 2, 1, 3, 2, 0, 0, 0, 3, 0, 3, 0, 1, 3, 2, 2, 0, 1, 3, 3, 0, 0, 1, 3, 3, 4, 0, 1, 3, 3,
+             2, 2, 1, 3, 3, 0, 2, 1, 3, 3, 4, 0, 1, 2, 2, 2, 2, 1, 2, 3, 4, 2, 1, 3, 3, 0, 0, 1, 2, 3, 2, 2, 1, 3, 3, 2,
+             0, 1, 3, 0, 4, 2, 1, 3, 2, 2, 0, 1, 3, 3, 4, 0, 1, 3, 3, 2, 2, 1, 3, 2, 4, 0, 1, 3, 2, 2, 0, 1, 3, 0, 3, 0,
+             0, 3, 2, 2, 0, 1, 2, 2, 0, 0, 1, 3, 3, 0, 0, 1, 0, 3, 2, 0, 1, 3, 3, 0, 2, 1, 3, 0, 1, 1, 1, 0, 3, 2, 2, 1,
+             3, 2, 1, 0, 1, 2, 3, 2, 0, 1, 3, 2, 4, 0, 0, 0, 3, 0, 2, 0, 2, 2, 2, 0, 1, 0, 3, 1, 1, 0, 3, 2, 4, 0, 1, 3,
+             3, 2, 0, 1, 2, 2, 1, 1, 1, 3, 2, 0, 0, 1, 2, 3, 0, 0, 1, 2, 2, 0, 2, 1, 3, 2, 0, 0, 1, 2, 3, 2, 2, 1, 3, 3,
+             4, 0, 1, 3, 2, 2, 0, 1, 3, 2, 0, 0, 0, 2, 3, 0, 0, 1, 3, 2, 0, 0, 1, 3, 3, 0, 0, 1, 2, 3, 0, 1, 1, 3, 2, 2,
+             0, 1, 3, 0, 2, 0, 1, 3, 3, 2, 2, 1, 2, 1, 2, 2, 0, 0, 3, 1, 0, 0, 3, 0, 0, 0, 1, 3, 3, 2, 0, 1, 2, 3, 0, 2,
+             0, 3, 0, 2, 0, 1, 3, 3, 2, 0, 1, 3, 3, 4, 2, 0, 3, 2, 0, 0, 1, 3, 2, 4, 0, 1, 3, 0, 3, 0, 1, 3, 0, 0, 0, 1,
+             3, 3, 0, 2, 1, 3, 2, 4, 0, 0, 0, 3, 4, 0, 1, 3, 3, 0, 0, 1, 3, 0, 2, 0, 1, 3, 2, 2, 2, 1, 3, 3, 2, 2, 1, 3,
+             2, 0, 2, 1, 3, 2, 4, 2, 1, 2, 2, 0, 2, 1, 3, 3, 0, 2, 1, 2, 2, 2, 0, 0, 2, 1, 3, 2, 1, 1, 2, 2, 0, 1, 3, 0,
+             2, 0, 1, 3, 0, 4, 0, 1, 3, 3, 4, 0, 1, 3, 2, 2, 0, 1, 2, 1, 4, 0, 1, 3, 2, 2, 0, 1, 3, 3, 0, 0, 1, 2, 2, 2,
+             0, 1, 3, 3, 0, 2, 1, 3, 2, 2, 0, 0, 1, 3, 4, 2, 1, 3, 2, 2, 0, 1, 2, 1, 3, 2, 0, 0, 3, 2, 0, 1, 3, 0, 3, 2,
+             1, 2, 2, 2, 2, 0, 0, 3, 2, 2, 1, 3, 3, 2, 0, 1, 2, 3, 0, 2, 1, 3, 3, 4, 0, 0, 3, 3, 2, 0, 1, 1, 2, 4, 0, 1,
+             3, 3, 0, 0, 1, 3, 2, 2, 0, 0, 2, 3, 2, 0, 1, 3, 3, 0, 0, 0, 2, 2, 0, 0, 1, 3, 3, 4, 0, 1, 3, 3, 2, 0, 1, 3,
+             3, 2, 2, 1, 1, 3, 0, 0, 1, 2, 1, 0, 1, 1, 3, 3, 2, 2, 1, 2, 3, 2, 0, 1, 2, 1, 0, 0, 1, 3, 2, 0, 0, 1, 3, 3,
+             2, 2, 1, 1, 2, 1, 0, 0, 3, 3, 0, 2, 1, 3, 3, 4, 0, 1, 2, 1, 3, 2, 1, 3, 3, 2, 0, 1, 2, 1, 2, 0, 1, 2, 3, 2,
+             0, 0, 3, 0, 3, 2, 1, 2, 3, 0, 1, 1, 3, 3, 0, 0, 1, 3, 3, 0, 2, 1, 3, 3, 0, 0, 1, 3, 3, 2, 0, 1, 3, 3, 2, 0,
+             1, 3, 0, 2, 0, 1, 2, 3, 0, 1, 1, 3, 3, 2, 0, 1, 2, 3, 0, 0, 1, 3, 3, 2, 0, 1, 3, 2, 4, 2, 1, 3, 3, 2, 0, 1,
+             3, 2, 0, 0, 1, 3, 2, 2, 2, 1, 3, 2, 1, 1, 1, 3, 2, 4, 2, 1, 3, 3, 2, 0, 1, 2, 1, 2, 0, 0, 3, 3, 0, 0, 0, 2,
+             2, 1, 0, 0, 3, 2, 2, 0, 1, 3, 0, 2, 0, 1, 2, 1, 1, 2, 1, 3, 2, 0, 0, 1, 2, 3, 2, 2, 1, 1, 3, 0, 0, 1, 3, 3,
+             0, 0, 1, 2, 1, 2, 2, 1, 3, 3, 0, 2, 1, 3, 3, 2, 0, 1, 3, 2, 2, 2, 0, 3, 2, 4, 0, 1, 3, 3, 0, 0, 1, 1, 2, 2,
+             2, 1, 3, 0, 4, 2, 1, 2, 2, 2, 2, 1, 3, 2, 2, 2, 1, 2, 3, 0, 0, 0, 2, 1, 2, 0, 1, 3, 3, 2, 0, 1, 3, 3, 4, 0,
+             0, 0, 3, 0, 2, 1, 2, 3, 0, 1, 1, 3, 3, 0, 0, 1, 3, 3, 0, 0, 1, 3, 3, 2, 2, 1, 3, 2, 0, 0, 1, 2, 3, 2, 0, 0,
+             2, 3, 2, 0, 1, 1, 2, 2, 2, 1, 3, 3, 0, 0, 1, 3, 3, 0, 0, 0, 1, 2, 2, 0, 1, 3, 3, 0, 2, 1, 3, 3, 0, 0, 1, 3,
+             2, 0, 1, 1, 2, 1, 2, 0, 1, 3, 3, 0, 2, 1, 3, 0, 3, 0, 0, 2, 2, 2, 2, 1, 3, 2, 2, 0, 0, 3, 3, 0, 2, 0, 3, 0,
+             0, 0, 1, 3, 3, 0, 0, 1, 3, 0, 3, 2, 1, 1, 2, 2, 2, 1, 3, 0, 4, 2, 1, 3, 3, 0, 0, 1, 2, 1, 2, 0, 1, 2, 1, 2,
+             0, 0, 3, 2, 1, 0, 1, 3, 3, 2, 0, 1, 3, 3, 0, 2, 1, 3, 0, 3, 0, 0, 3, 3, 4, 0, 1, 3, 2, 4, 2, 1, 3, 3, 4, 0,
+             1, 3, 2, 2, 2, 1, 3, 2, 1, 1, 1, 2, 1, 0, 0, 1, 2, 1, 3, 0, 1, 3, 2, 0, 0, 1, 3, 2, 0, 2, 0, 0, 3, 1, 2, 0,
+             3, 0, 0, 0, 1, 0, 3, 1, 0, 0, 3, 0, 2, 0, 1, 3, 0]
+ret = prefix
+r, m = divmod(1000000000000 + 1 - prefix_l, len(repeating))
+ret += r * sum(repeating) + sum(repeating[:m])
+print(ret)
