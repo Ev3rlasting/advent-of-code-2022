@@ -1,5 +1,6 @@
 import collections
 import functools
+import gc
 import heapq
 import itertools
 import math
@@ -32,40 +33,56 @@ pprint(BLUEPRINTS)
 # @functools.lru_cache(maxsize=None)
 MIN = 24
 
+
 @functools.lru_cache(maxsize=None)
-def dfs(r0, r1, r2, r3, b0, b1, b2, b3, blueprint, minute):
-    global m0, m1, m2
-    # if minute == MIN - 2 - blueprint[3][2]:
-    #     return b3 * (MIN - minute) + r3
-    # if minute == MIN - 3 - blueprint[2][1] - blueprint[3][2] and b1 == 0:
+def dfs(r0, r1, r2, r3,
+        b0, b1, b2,
+        m0, m1, m2,
+        blueprint, minute):
+    # if minute == MIN - 1 - blueprint[3][2] and b2 == 0:
     #     return 0
     # print(f'min {minute}\t r0 {r0}\t r1 {r1}\t r2 {r2}\t r3 {r3}\t b0 {b0}\t b1 {b1}\t b2 {b2}\t b3 {b3}')
     if minute == MIN: return r3
     p0 = p1 = p2 = p3 = p4 = 0
     # build geode robot (b3)
+    minute += 1
     if r2 >= blueprint[3][2] and r0 >= blueprint[3][0]:
-        p0 = dfs(r0 - blueprint[3][0] + b0, r1 + b1, r2 - blueprint[3][2] + b2, r3 + b3, b0, b1, b2, b3 + 1, blueprint,
-                 minute + 1)
+        p0 = dfs(r0 - blueprint[3][0] + b0, r1 + b1, r2 - blueprint[3][2] + b2, r3 + MIN - minute,
+                 b0, b1, b2,
+                 m0, m1, m2,
+                 blueprint, minute)
     # build obsidian robot (b2)
     if r1 >= blueprint[2][1] and r0 >= blueprint[2][0] and b2 < m2:
-        p1 = dfs(r0 - blueprint[2][0] + b0, r1 - blueprint[2][1] + b1, r2 + b2, r3 + b3, b0, b1, b2 + 1, b3, blueprint,
-                 minute + 1)
+        p1 = dfs(r0 - blueprint[2][0] + b0, r1 - blueprint[2][1] + b1, r2 + b2, r3,
+                 b0, b1, b2 + 1,
+                 m0, m1, m2,
+                 blueprint, minute)
     # build clay robot (b1)
     if r0 >= blueprint[1][0] and b1 < m1:
-        p2 = dfs(r0 - blueprint[1][0] + b0, r1 + b1, r2 + b2, r3 + b3, b0, b1 + 1, b2, b3, blueprint, minute + 1)
+        p2 = dfs(r0 - blueprint[1][0] + b0, r1 + b1, r2 + b2, r3,
+                 b0, b1 + 1, b2,
+                 m0, m1, m2,
+                 blueprint, minute)
     # build ore robot (b0)
     if r0 >= blueprint[0][0] and b0 < m0:
-        p3 = dfs(r0 - blueprint[0][0] + b0, r1 + b1, r2 + b2, r3 + b3, b0 + 1, b1, b2, b3, blueprint, minute + 1)
-    p4 = dfs(r0 + b0, r1 + b1, r2 + b2, r3 + b3, b0, b1, b2, b3, blueprint, minute + 1)
+        p3 = dfs(r0 - blueprint[0][0] + b0, r1 + b1, r2 + b2, r3,
+                 b0 + 1, b1, b2,
+                 m0, m1, m2,
+                 blueprint, minute)
+    p4 = dfs(r0 + b0, r1 + b1, r2 + b2, r3,
+             b0, b1, b2,
+             m0, m1, m2,
+             blueprint, minute)
     return max(p0, p1, p2, p3, p4)
 
 
-for idx, blueprint in enumerate(BLUEPRINTS[:3]):
+for idx, blueprint in enumerate(BLUEPRINTS[:]):
     idx += 1
     m0 = max([blueprint[_][0] for _ in range(4)])
     m1 = max([blueprint[_][1] for _ in range(4)])
     m2 = max([blueprint[_][2] for _ in range(4)])
     print(m0, m1, m2)
-    score = dfs(2, 0, 0, 0, 1, 0, 0, 0, blueprint, 2)
+    score = dfs(2, 0, 0, 0, 1, 0, 0, m0, m1, m2, blueprint, 2)
     ret += score * idx
+    gc.collect()
 print(ret)
