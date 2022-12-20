@@ -33,4 +33,4 @@ r1 = A[(zero + 1000) % len(A)]
 r2 = A[(zero + 2000) % len(A)]
 r3 = A[(zero + 3000) % len(A)]
 print(r1, r2, r3)
-print('part1', r1[0] + r2[0] + r3[0])
+print('part2', r1[0] + r2[0] + r3[0])
