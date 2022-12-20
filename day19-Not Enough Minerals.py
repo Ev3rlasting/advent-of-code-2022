@@ -88,4 +88,4 @@ for idx, blueprint in enumerate(BLUEPRINTS[:3]):
     # print(score)
     ret *= score
     gc.collect()
-print(ret)
+print('part2', ret)
