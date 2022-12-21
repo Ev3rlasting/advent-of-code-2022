@@ -31,25 +31,10 @@ for line in lines:
         if monkey == 'root':
             TWO = G[monkey].copy()
 
-
-def topo(g, yells, yell_to):
-    while 'root' in g:
-        for yell in yells.copy():
-            shout = yells[yell]
-            depend = yell_to[yell][0]
-            if yell not in g[depend]: continue
-            idx = g[depend].index(yell)
-            g[depend][idx] = shout
-            if all(isinstance(a, int) or isinstance(a, float) for a in g[depend]):
-                yells[depend] = eval(str(g[depend][0]) + OPS[depend] + str(g[depend][1]))
-                del g[depend]
-    return yells['root']
-
-
 one, two = TWO
 
 
-def topo2(g, yells, yell_to):
+def topo(g, yells, yell_to, part):
     while 'root' in g:
         for yell in yells.copy():
             shout = yells[yell]
@@ -60,13 +45,14 @@ def topo2(g, yells, yell_to):
             if all(isinstance(a, int) or isinstance(a, float) for a in g[depend]):
                 yells[depend] = eval(str(g[depend][0]) + OPS[depend] + str(g[depend][1]))
                 del g[depend]
-    return yells[one], yells[two]
+    return int(yells['root']) if part == 1 else (yells[one], yells[two])
 
 
-N = 3699945358541 # just some run topo2 you will know the pattern
+print('part1', topo(deepcopy(G), deepcopy(YELL), deepcopy(YELL_TO), 1))
+N = 3699945358541  # just some run topo calls you will know the range
 for i in range(N, N * 2):
     YELL['humn'] = i
-    a, b = topo2(deepcopy(G), deepcopy(YELL), deepcopy(YELL_TO))
+    a, b = topo(deepcopy(G), deepcopy(YELL), deepcopy(YELL_TO), 2)
     print(a - b, i)
     if a == b:
         print('part2', a, b, i)
