@@ -12,8 +12,6 @@ from copy import deepcopy
 f = open('input')
 lines = f.readlines()
 # lines = [_.strip() for _ in lines]
-TILES = set()
-WALLS = set()
 first = None
 mat = []
 N = len(lines[0].replace('\n', ''))
@@ -67,7 +65,6 @@ def move(point, direction, step):
             y = 0
         elif y < 0:
             y = len(mat) - 1
-        print('\t\tchecking #', x, y)
         if mat[y][x] == '#':
             return prevOk
         if mat[y][x] == ' ':
@@ -75,7 +72,6 @@ def move(point, direction, step):
         step -= 1
         prevOk = (x, y)
     return x, y
-
 
 s = ''
 point = first
@@ -91,6 +87,4 @@ for ch in MOVES + 'L':
     else:
         s += ch
 print(point, lastDir)
-# print(TILES)
-# print(WALLS)
-print((point[0] + 1) * 4 + (point[1] + 1) * 1000 + list(TURN).index(lastDir))
+print('part1', (point[0] + 1) * 4 + (point[1] + 1) * 1000 + list(TURN).index(lastDir))
