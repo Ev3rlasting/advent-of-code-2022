@@ -12,7 +12,6 @@ from copy import deepcopy
 f = open('input')
 lines = f.readlines()
 lines = [_.strip() for _ in lines]
-ret = 0
 POS = set()
 for i, line in enumerate(lines):
     for j, ch in enumerate(line):
@@ -45,8 +44,7 @@ DIRECTIONS = collections.OrderedDict({
     'S': [checkS, (0, 1)],
     'W': [checkW, (-1, 0)],
     'E': [checkE, (1, 0)]
-}
-)
+})
 
 for round in range(30000):
     moved = False
@@ -56,12 +54,12 @@ for round in range(30000):
         if any((a, b) in POS for a, b in adj(x, y)):
             for d, (fn, move) in DIRECTIONS.items():
                 if all((a, b) not in POS for a, b in fn(x, y)):
-                    moveTo[(x + move[0], y + move[1])].append(((x, y), move))
+                    moveTo[(x + move[0], y + move[1])].append((x, y))
                     break
     for mt in moveTo:
         if len(moveTo[mt]) == 1:
             moved = True
-            POS.discard(moveTo[mt][0][0])
+            POS.discard(moveTo[mt][0])
             POS.add(mt)
     if not moved:
         print('part2', round + 1)
