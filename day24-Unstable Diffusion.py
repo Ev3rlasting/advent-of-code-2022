@@ -34,10 +34,6 @@ M = len(lines)
 start = (1, 0)
 END = (N - 2, M - 1)
 
-
-# print('end', end)
-
-
 def adj(i, j):
     for a, b in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
         if N > a >= 0 and M > b >= 0:
@@ -50,9 +46,6 @@ PROCESSED = dict()
 
 
 def snowMove(prevSnow):
-    h = hash(prevSnow)
-    if h in PROCESSED:
-        return PROCESSED[h]
     snow = prevSnow
     newSnow = defaultdict(list)
     for i, j in snow:
@@ -79,23 +72,17 @@ def snowMove(prevSnow):
                     if (ii, jj) in WALL:
                         jj += 1
             newSnow[(ii, jj)].append(ch)
-    PROCESSED[h] = newSnow
+    # PROCESSED[h] = newSnow
     return newSnow
-
-
-def hash(d):
-    return yaml.dump(d, sort_keys=True).encode()
-
 
 ret = float('inf')
 visited = set()
 LIMIT = 300
 STATE = None
 
-
 def dfs(i, j, minute, end, prevSnow):
     global ret, STATE
-    if minute > LIMIT: return
+    if minute > ret or minute > LIMIT: return
     if (i, j) == end:
         if minute < ret:
             ret = minute
@@ -108,8 +95,7 @@ def dfs(i, j, minute, end, prevSnow):
         if (a, b, minute) not in visited and (a, b) not in snow and (a, b) not in WALL:
             dfs(a, b, minute, end, snow)
             visited.add((a, b, minute))
-    if (i, j) in snow: return
-    if (i, j, minute) not in visited:
+    if (i, j) not in snow and (i, j, minute) not in visited:
         dfs(i, j, minute, end, snow)
         visited.add((i, j, minute))
 
