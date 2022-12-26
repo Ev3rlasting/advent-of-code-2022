@@ -1,13 +1,5 @@
-import collections
 import functools
 import gc
-import heapq
-import itertools
-import math
-import sys
-from collections import defaultdict, Counter
-import functools
-from pprint import pprint
 
 f = open('input')
 lines = f.readlines()

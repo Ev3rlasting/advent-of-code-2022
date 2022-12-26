@@ -1,6 +1,3 @@
-import math
-from collections import defaultdict, deque
-from pprint import pprint
 import heapq
 
 f = open('input')

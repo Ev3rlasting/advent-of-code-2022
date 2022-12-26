@@ -1,17 +1,3 @@
-import collections
-import functools
-import heapq
-import itertools
-import json
-import math
-import sys
-from collections import defaultdict, Counter
-import functools
-from pprint import pprint
-from copy import deepcopy
-import sys
-
-import yaml
 f = open('input')
 lines = f.readlines()
 lines = [_.strip() for _ in lines]

@@ -1,12 +1,4 @@
-import collections
-import functools
-import heapq
-import itertools
-import math
-import sys
-from collections import defaultdict, Counter
-import functools
-from pprint import pprint
+from collections import defaultdict
 from copy import deepcopy
 
 f = open('input')

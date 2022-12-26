@@ -1,6 +1,4 @@
-import math
 from collections import defaultdict
-from pprint import pprint
 
 f = open('input')
 lines = f.readlines()

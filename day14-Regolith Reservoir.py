@@ -1,9 +1,4 @@
-import functools
 import itertools
-import math
-from collections import defaultdict, Counter
-from functools import cmp_to_key
-from pprint import pprint
 
 f = open('input')
 lines = f.readlines()

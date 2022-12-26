@@ -1,12 +1,4 @@
 import collections
-import functools
-import heapq
-import itertools
-import math
-import sys
-from collections import defaultdict, Counter
-from functools import cmp_to_key
-from pprint import pprint
 
 f = open('input')
 lines = f.readlines()
