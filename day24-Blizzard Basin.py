@@ -39,13 +39,11 @@ def adj(i, j):
         if N > a >= 0 and M > b >= 0:
             yield a, b
 
-
-ret = float('inf')
-
-PROCESSED = dict()
-
-
-def snowMove(prevSnow):
+LCM = N * M // math.gcd(N, M)
+seen = dict()
+def snowMove(prevSnow, minute):
+    if minute % LCM in seen:
+        return seen[minute % LCM]
     snow = prevSnow
     newSnow = defaultdict(list)
     for i, j in snow:
@@ -72,7 +70,7 @@ def snowMove(prevSnow):
                     if (ii, jj) in WALL:
                         jj += 1
             newSnow[(ii, jj)].append(ch)
-    # PROCESSED[h] = newSnow
+    seen[minute % LCM] = newSnow
     return newSnow
 
 ret = float('inf')
@@ -89,7 +87,7 @@ def dfs(i, j, minute, end, prevSnow):
             STATE = deepcopy(prevSnow)
         return minute
     minute += 1
-    snow = snowMove(prevSnow)
+    snow = snowMove(prevSnow, minute)
 
     for a, b in adj(i, j):
         if (a, b, minute) not in visited and (a, b) not in snow and (a, b) not in WALL:
